@@ -26,9 +26,7 @@ if(!isset($_SESSION['member_num'])){
         font-size: 62.5%;/*rem算出をしやすくするために*/
         }
 
-        .btn,
-        a.btn,
-        button.btn {
+        button {
             font-size: 1.6rem;
             font-weight: 700;
             line-height: 1.5;
@@ -48,13 +46,12 @@ if(!isset($_SESSION['member_num'])){
             letter-spacing: 0.1em;
             color: #212529;
             border-radius: 0.5rem;
+            border: 0px;
         }
-        .shukkin,
-        a.shukkin{
+        button{
             background-color: lavender;
         }
-        .shukkin:hover,
-        a.shukkin:hover{
+        button:hover{
             color: #fff;
             background-color: lightslategray;
         }
@@ -80,21 +77,51 @@ if(!isset($_SESSION['member_num'])){
         //DB接続時エラーの時、エラーメッセージを出力して終了する
         exit($e-getMessage());
     }
-    //クエリ　POSTされたmember_numと同じIDのパスワードを取得する
-    $query = $dsn->prepare('SELECT name FROM user WHERE member_num = :member_num');
-    //SQL文をセットした後にパラメータ（:member_num）に値をセットする
-    $query->bindValue(':member_num', $_SESSION['member_num'], PDO::PARAM_STR);
-    //クエリを実行
-    $query->execute();
-    //結果を取得
-    $result = $query->fetch();
+        //クエリ　セッション変数のmember_numに対応する社員名を取得する
+        $query = $dsn->prepare('SELECT name FROM user WHERE member_num = :member_num');
+        //SQL文をセットした後にパラメータ（:member_num）に値をセットする
+        $query->bindValue(':member_num', $_SESSION['member_num'], PDO::PARAM_STR);
+        //クエリを実行
+        $query->execute();
+        //結果を取得
+        $result = $query->fetch();
+
+        //出勤が押されたら
+        if(isset($_POST['start'])){
+            //クエリ　出勤時間のレコードをテーブルに追加する
+            $query = $dsn->prepare('UPDATE work SET start = now() WHERE member_num = :num AND date = :today');
+            //クエリを実行
+            $query->execute(array(
+                ':num' => $_SESSION['member_num'],
+                ':today' => date("j")
+            ));
+        }
+
+        //退勤が押されたら
+        if(isset($_POST['finish'])){
+            //クエリ　退勤時間のレコードをテーブルに追加する
+            $query = $dsn->prepare('UPDATE work SET finish = now() WHERE member_num = :num AND date = :today');
+            //クエリを実行
+            $query->execute(array(
+                ':num' => $_SESSION['member_num'],
+                ':today' => date("j")
+            ));
+            //勤務時間を記録
+            $query = $dsn->prepare('UPDATE work SET time = (finish - start) / 60  WHERE member_num = :num AND date = :today');
+            $query->execute(array(
+                ':num' => $_SESSION['member_num'],
+                ':today' => date("j")
+            ));
+        }
     ?>
 
     <div class="kanri">
     <h2><?php echo $result['name'];?>さん、お疲れ様です。</h2>
-    <a href="" class="btn shukkin">出勤</a>
-    <a href="" class="btn shukkin">退勤</a><br><br><br>
-    <a href="logout.php">ログアウトする</a>  
+    <form action="" method="post">
+        <button type="submit" name="start">出勤</button>
+        <button type="submit" name="finish">退勤</button><br><br><br>
+        <a href="logout.php">ログアウトする</a>  
+    </form>
     </div>
     
 </body>
