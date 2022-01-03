@@ -14,7 +14,6 @@ if(!isset($_SESSION['member_num'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>勤怠登録</title>
     <style>
-                *,
         *:before,
         *:after {
         -webkit-box-sizing: inherit;
@@ -23,7 +22,7 @@ if(!isset($_SESSION['member_num'])){
 
         html {
 
-        font-size: 62.5%;/*rem算出をしやすくするために*/
+        font-size: 80%;/*rem算出をしやすくするために*/
         }
 
         button {

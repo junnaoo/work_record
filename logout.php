@@ -33,7 +33,7 @@ session_destroy(); //セッション破棄
 </head>
 <body>
     <div class="kanri">
-    <h1>ログアウトしました</h1>
+    <h2>ログアウトしました</h2>
     <a href="login.php">ログインページに戻る</a>
     </div>
 </body>
